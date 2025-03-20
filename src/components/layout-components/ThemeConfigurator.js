@@ -1,5 +1,5 @@
-import React from 'react'
-import {connect, useDispatch, useSelector} from 'react-redux'
+import React from 'react';
+import { connect } from 'react-redux';
 import { Radio, Switch, Button, message } from 'antd';
 import {
 	toggleCollapsedNav,
@@ -22,40 +22,42 @@ import {
 import { useThemeSwitcher } from "react-css-theme-switcher";
 import utils from 'utils/index';
 import {Link} from "react-router-dom";
-import {CLEAR_USER, SIGNOUT_SUCCESS} from "../../redux/constants/Auth";
-
+import useAuth from 'auth/useAuth';
 const colorOptions = [
 	'#3e82f7',
 	'#24a772',
 	'#de4436',
 	'#924aca',
 	'#193550'
-]
+];
 
-const ListOption = ({name, selector, disabled, vertical}) => (
-	<div className={`my-4 ${vertical? '' : 'd-flex align-items-center justify-content-between'}`}>
-		<div className={`${disabled ? 'opacity-0-3' : ''} ${vertical? 'mb-3' : ''}`}>{name}</div>
+const ListOption = ({ name, selector, disabled, vertical }) => (
+	<div className={`my-4 ${vertical ? '' : 'd-flex align-items-center justify-content-between'}`}>
+		<div className={`${disabled ? 'opacity-0-3' : ''} ${vertical ? 'mb-3' : ''}`}>{name}</div>
 		<div>{selector}</div>
 	</div>
-)
+);
 
 export const ThemeConfigurator = ({
-	navType,
-	sideNavTheme,
-	navCollapsed,
-	topNavColor,
-	headerNavColor,
-	locale,
-	currentTheme,
-	toggleCollapsedNav,
-	onNavTypeChange,
-	onNavStyleChange,
-	onTopNavColorChange,
-	onHeaderNavColorChange,
-	onSwitchTheme
-}) => {
-	const isNavTop = navType === NAV_TYPE_TOP? true : false
-	const isCollapse = navCollapsed
+									  navType,
+									  sideNavTheme,
+									  navCollapsed,
+									  topNavColor,
+									  headerNavColor,
+									  locale,
+									  currentTheme,
+									  toggleCollapsedNav,
+									  onNavTypeChange,
+									  onNavStyleChange,
+									  onTopNavColorChange,
+									  onHeaderNavColorChange,
+									  onSwitchTheme
+								  }) => {
+
+	const { token, logout } = useAuth();
+
+	const isNavTop = navType === NAV_TYPE_TOP ? true : false;
+	const isCollapse = navCollapsed;
 
 	const { switcher, themes } = useThemeSwitcher();
 
@@ -65,20 +67,6 @@ export const ThemeConfigurator = ({
 		onSwitchTheme(changedTheme)
     switcher({ theme: themes[changedTheme] });
   };
-
-
-	const dispatch = useDispatch();
-	const token = useSelector(state => state.auth.token);
-
-	const handleLogout = () => {
-		// Удаление токена из localStorage
-		localStorage.removeItem('auth_token');
-
-		// Очистка состояния пользователя в Redux
-		dispatch({ type: CLEAR_USER });
-		dispatch({ type: SIGNOUT_SUCCESS });
-	};
-
 
 	const ontopNavColorClick = (value) => {
 		onHeaderNavColorChange('')
@@ -100,8 +88,8 @@ export const ThemeConfigurator = ({
 			onTopNavColorChange(colorOptions[0])
 			toggleCollapsedNav(false)
 		}
-		onNavTypeChange(value)
-	}
+		onNavTypeChange(value);
+	};
 
 	const genCopySettingJson = (configState) => JSON.stringify(configState, null, 2);
 
@@ -109,11 +97,13 @@ export const ThemeConfigurator = ({
 		<>
 			<div className="mb-2">
 				<div className="mb-3">
-					{token ? (
-						<button onClick={handleLogout}>Logout</button>
-					) : (
-						<Link to="/login" >Login</Link>
-					)}
+					<div>
+						{token ? (
+							<button onClick={logout}>Logout</button>
+						) : (
+							<Link to="/login">Login</Link>
+						)}
+					</div>
 				</div>
 				<h4 className="mb-3 font-weight-bold">Navigation</h4>
 				{
@@ -122,7 +112,7 @@ export const ThemeConfigurator = ({
 							name="Top Nav Color:"
 							vertical
 							selector={
-								<ColorPicker color={topNavColor} colorChange={ontopNavColorClick}/>
+								<ColorPicker color={topNavColor} colorChange={ontopNavColorClick} />
 							}
 						/>
 						:
@@ -130,7 +120,7 @@ export const ThemeConfigurator = ({
 							name="Header Nav Color:"
 							vertical
 							selector={
-								<ColorPicker color={headerNavColor} colorChange={onHeaderNavColorClick}/>
+								<ColorPicker color={headerNavColor} colorChange={onHeaderNavColorClick} />
 							}
 						/>
 				}
@@ -177,7 +167,7 @@ export const ThemeConfigurator = ({
 				<ListOption
 					name="Dark Theme:"
 					selector={
-						<Switch checked={currentTheme === 'dark'} onChange={toggleTheme}/>
+						<Switch checked={currentTheme === 'dark'} onChange={toggleTheme} />
 					}
 				/>
 			</div>
@@ -186,7 +176,7 @@ export const ThemeConfigurator = ({
 				<ListOption
 					name="Language:"
 					selector={
-						<NavLanguage configDisplay/>
+						<NavLanguage configDisplay />
 					}
 				/>
 			</div>
@@ -202,13 +192,13 @@ export const ThemeConfigurator = ({
 						currentTheme})}
 					onCopy={() => message.success('Copy Success, please paste it to src/configs/AppConfig.js THEME_CONFIG variable.') }
 				>
-					<Button icon={<CopyOutlined /> } block>
+					<Button icon={<CopyOutlined />} block>
 						<span>Copy Setting</span>
 					</Button>
 				</CopyToClipboard>
 			</div>
 		</>
-	)
+	);
 }
 
 const mapStateToProps = ({ theme }) => {
